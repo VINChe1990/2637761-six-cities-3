@@ -1,8 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { rootReducer } from './reducer';
 import {createAPI} from '../services/api';
+import { redirect } from './middlewares/redirect';
+import { createBrowserHistory } from 'history';
 
-export const api = createAPI();
+const api = createAPI();
+export const browserHistory = createBrowserHistory();
 
 export const store = configureStore({
   reducer: rootReducer,
@@ -11,5 +14,5 @@ export const store = configureStore({
       thunk: {
         extraArgument: api,
       },
-    })
+    }).concat(redirect(browserHistory))
 });

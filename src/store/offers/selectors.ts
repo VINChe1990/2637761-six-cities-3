@@ -12,6 +12,5 @@ const getCityPlacesCount = (state: State): number => state[SliceSpace.Offers].ci
 const getSortType = (state: State): SortType => state[SliceSpace.Offers].sortType;
 
 const getOffer = (state: State): OfferView => state[SliceSpace.Offers].offerView;
-const getFavorites = (state: State): IPlace[] => state[SliceSpace.Offers].favorites;
 
-export { getDataIsLoading, getAllCities, getCity, getCityPlaces, getCityPlacesCount, getSortType, getOffer, getFavorites };
+export { getDataIsLoading, getAllCities, getCity, getCityPlaces, getCityPlacesCount, getSortType, getOffer };

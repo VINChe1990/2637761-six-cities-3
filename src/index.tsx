@@ -1,12 +1,14 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
-import App from './components/App/App';
+import { ToastContainer } from 'react-toastify';
 import { Provider } from 'react-redux';
-import { store } from './store';
-import { fetchOffersAction, fetchFavoritesAction } from './store/apiActions';
+import App from './components/App/App';
+import { browserHistory, store } from './store';
+import { fetchOffersAction, checkAuthAction } from './store/apiActions';
+import HistoryRouter from './components/historyRoute/historyRoute';
 
+store.dispatch(checkAuthAction());
 store.dispatch(fetchOffersAction());
-store.dispatch(fetchFavoritesAction());
 
 const root = createRoot(
   document.getElementById('root') as HTMLElement
@@ -15,7 +17,10 @@ const root = createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App/>
+      <HistoryRouter history={browserHistory}>
+        <ToastContainer />
+        <App />
+      </HistoryRouter>
     </Provider>
   </React.StrictMode>
 );

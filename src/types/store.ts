@@ -3,6 +3,7 @@ import {AuthorizationStatus, SortType} from '../const';
 import { IPlace } from './place.ts';
 import { City } from './city.ts';
 import { OfferView } from './place';
+import { ISiteUser } from './user.ts';
 
 export type OffersState = {
   cities: City[];
@@ -17,8 +18,15 @@ export type OffersState = {
   hasError: boolean;
 };
 
+export type FavoritesState = {
+  favorites: IPlace[];
+  dataLoading: boolean;
+  hasError: boolean;
+};
+
 export type UserState = {
   authStatus: AuthorizationStatus;
+  User?: ISiteUser;
   dataLoading: boolean;
   hasError: boolean;
 };

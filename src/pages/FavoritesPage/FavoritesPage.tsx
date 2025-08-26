@@ -8,7 +8,8 @@ import { City } from '../../types/city';
 import { IPlace } from '../../types/place';
 
 import { useAppSelector } from '../../hooks';
-import { getAllCities, getFavorites } from '../../store/offers/selectors';
+import { getAllCities } from '../../store/offers/selectors';
+import { getFavorites } from '../../store/favorites/selectors';
 
 type FavoriteCityPlaces = {
   city: City;

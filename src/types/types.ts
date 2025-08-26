@@ -30,5 +30,6 @@ export enum MapViewType {
 
 export enum SliceSpace {
   Offers = 'Offers',
+  Favorites = 'Favorites',
   User = 'User'
 }
