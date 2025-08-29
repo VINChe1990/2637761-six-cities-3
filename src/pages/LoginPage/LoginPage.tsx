@@ -13,8 +13,8 @@ const LoginPage = () => {
     await store.dispatch(loginAction(authData));
   };
 
-  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
     if (loginRef.current !== null && passwordRef.current !== null) {
       onSubmit({

@@ -26,7 +26,7 @@ export type FavoritesState = {
 
 export type UserState = {
   authStatus: AuthorizationStatus;
-  User?: ISiteUser;
+  User: ISiteUser | undefined;
   dataLoading: boolean;
   hasError: boolean;
 };

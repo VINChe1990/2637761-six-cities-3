@@ -65,7 +65,7 @@ const UserReviews = () => {
 
   const { reviews } = useAppSelector(getOffer);
 
-  const [newReview, setNewReview] = useState<IReview | undefined>(getDefaultReview(user));
+  const [newReview, setNewReview] = useState<IReview | undefined>(() => getDefaultReview(user));
   const [isValidReview, setIsValidReview] = useState<boolean>(false);
 
   useEffect(() => {
