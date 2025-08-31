@@ -5,9 +5,10 @@ import {SliceSpace} from '../../types/types';
 import {AuthorizationStatus} from '../../const';
 
 const initialState: UserState = {
-  authStatus: AuthorizationStatus.Auth,
+  authStatus: AuthorizationStatus.Unknown,
+  User: undefined,
   dataLoading: false,
-  hasError: false
+  hasError: false,
 };
 
 export const user = createSlice({
@@ -16,14 +17,16 @@ export const user = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder
-      .addCase(checkAuthAction.fulfilled, (state) => {
+      .addCase(checkAuthAction.fulfilled, (state, action) => {
         state.authStatus = AuthorizationStatus.Auth;
+        state.User = action.payload;
       })
       .addCase(checkAuthAction.rejected, (state) => {
         state.authStatus = AuthorizationStatus.NoAuth;
       })
-      .addCase(loginAction.fulfilled, (state) => {
+      .addCase(loginAction.fulfilled, (state, action) => {
         state.authStatus = AuthorizationStatus.Auth;
+        state.User = action.payload;
       })
       .addCase(loginAction.rejected, (state) => {
         state.authStatus = AuthorizationStatus.NoAuth;

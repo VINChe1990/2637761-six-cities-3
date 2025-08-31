@@ -2,25 +2,29 @@ import { useState, useEffect, Fragment } from 'react';
 import { type ChangeEvent, type FormEvent } from 'react';
 import {AuthorizationStatus} from '../../const';
 import { IReview } from '../../types/types';
+import { IUser } from '../../types/user';
 
 import { useAppSelector } from '../../hooks';
-import { getAuthStatus } from '../../store/user/selectors';
+import { getAuthStatus, getUser } from '../../store/user/selectors';
 import { getOffer } from '../../store/offers/selectors';
-
-import {User} from '../../mocks/User';
 
 
 type ReviewsProps = {
   review: IReview;
 }
 
-const getDefaultReview = (): IReview => ({
-  id: '',
-  comment: '',
-  date: '',
-  rating: 0,
-  user: User
-});
+const getDefaultReview = (user?: IUser): IReview | undefined => {
+  if (user){
+    return {
+      id: '',
+      comment: '',
+      date: '',
+      rating: 0,
+      user: user
+    };
+  }
+  return undefined;
+};
 
 const Review = ({ review }: ReviewsProps) => {
   const date = new Date(review.date);
@@ -56,21 +60,22 @@ const Review = ({ review }: ReviewsProps) => {
 const UserReviews = () => {
 
   const authStatus = useAppSelector(getAuthStatus);
-  const userLogged = authStatus === AuthorizationStatus.Auth;
+  const user = useAppSelector(getUser);
+  const userLogged = authStatus === AuthorizationStatus.Auth && user;
 
   const { reviews } = useAppSelector(getOffer);
 
-  const [newReview, setNewReview] = useState<IReview>(getDefaultReview());
+  const [newReview, setNewReview] = useState<IReview | undefined>(() => getDefaultReview(user));
   const [isValidReview, setIsValidReview] = useState<boolean>(false);
 
   useEffect(() => {
     let isValid = true;
 
-    if (newReview.rating === 0) {
+    if (newReview && newReview.rating === 0) {
       isValid = false;
     }
 
-    if (newReview.comment.length < 50) {
+    if (newReview && newReview.comment.length < 50) {
       isValid = false;
     }
 
@@ -79,17 +84,21 @@ const UserReviews = () => {
 
   const handleRatingChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(event.target.value);
-    setNewReview({...newReview, rating: value});
+    if (newReview) {
+      setNewReview({...newReview, rating: value});
+    }
   };
 
   const handleCommentChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const {value} = event.target;
-    setNewReview({...newReview, comment: value});
+    if (newReview) {
+      setNewReview({...newReview, comment: value});
+    }
   };
 
   const handleClickSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setNewReview(getDefaultReview());
+    setNewReview(getDefaultReview(user));
   };
 
   const mapRatingStars = () => [1, 2, 3, 4, 5].reverse().map((rating) => {
@@ -114,7 +123,7 @@ const UserReviews = () => {
 
     return (
       <Fragment key={rating}>
-        <input className="form__rating-input visually-hidden" name="rating" value={rating} id={`${rating}-stars`} type="radio" onChange={handleRatingChange} checked={newReview.rating === rating}/>
+        <input className="form__rating-input visually-hidden" name="rating" value={rating} id={`${rating}-stars`} type="radio" onChange={handleRatingChange} checked={newReview?.rating === rating}/>
         <label htmlFor={`${rating}-stars`} className="reviews__rating-label form__rating-label" title={title}>
           <svg className="form__star-image" width="37" height="33">
             <use xlinkHref="#icon-star"></use>
@@ -136,7 +145,7 @@ const UserReviews = () => {
           <div className="reviews__rating-form form__rating">
             {mapRatingStars()}
           </div>
-          <textarea className="reviews__textarea form__textarea" id="review" name="review" placeholder="Tell how was your stay, what you like and what can be improved" onChange={handleCommentChange} value={newReview.comment}></textarea>
+          <textarea className="reviews__textarea form__textarea" id="review" name="review" placeholder="Tell how was your stay, what you like and what can be improved" onChange={handleCommentChange} value={newReview?.comment}></textarea>
           <div className="reviews__button-wrapper">
             <p className="reviews__help">
               To submit review please make sure to set <span className="reviews__star">rating</span> and describe your stay with at least <span className="reviews__text-amount">50 characters</span>.

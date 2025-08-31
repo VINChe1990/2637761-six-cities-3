@@ -56,27 +56,33 @@ export const fetchFavoritesAction = createAsyncThunk<IPlace[], undefined, {
 );
 
 
-export const checkAuthAction = createAsyncThunk<void, undefined, {
+export const checkAuthAction = createAsyncThunk<ISiteUser, undefined, {
   dispatch: AppDispatch;
   state: State;
   extra: AxiosInstance;
 }>(
   'checkAuth',
-  async (_arg, {extra: api}) => {
-    await api.get(APIRoute.Login);
+  async (_arg, {dispatch, extra: api }) => {
+    const { data } = await api.get<ISiteUser>(APIRoute.Login);
+    dispatch(fetchFavoritesAction());
+
+    return data;
   },
 );
 
-export const loginAction = createAsyncThunk<void, AuthData, {
+export const loginAction = createAsyncThunk<ISiteUser, AuthData, {
   dispatch: AppDispatch;
   state: State;
   extra: AxiosInstance;
 }>(
   'login',
-  async ({login: email, password}, {dispatch, extra: api}) => {
-    const {data: {token}} = await api.post<ISiteUser>(APIRoute.Login, {email, password});
-    saveToken(token);
+  async ({login: email, password}, { dispatch, extra: api }) => {
+    const { data } = await api.post<ISiteUser>(APIRoute.Login, {email, password});
+    saveToken(data.token);
     dispatch(redirectToRoute(AppRoute.Main));
+    dispatch(fetchFavoritesAction());
+
+    return data;
   },
 );
 
@@ -86,8 +92,9 @@ export const logoutAction = createAsyncThunk<void, undefined, {
   extra: AxiosInstance;
 }>(
   'logout',
-  async (_arg, {extra: api}) => {
+  async (_arg, { dispatch, extra: api }) => {
     await api.delete(APIRoute.Logout);
     dropToken();
+    dispatch(redirectToRoute(AppRoute.Login));
   },
 );
