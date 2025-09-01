@@ -4,7 +4,6 @@ import {createAPI} from '../services/api';
 import { redirect } from './middlewares/redirect';
 import { createBrowserHistory } from 'history';
 
-const api = createAPI();
 export const browserHistory = createBrowserHistory();
 
 export const store = configureStore({
@@ -12,7 +11,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       thunk: {
-        extraArgument: api,
+        extraArgument: createAPI(),
       },
     }).concat(redirect(browserHistory))
 });

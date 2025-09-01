@@ -1,12 +1,13 @@
 import { useState, useEffect, Fragment } from 'react';
 import { type ChangeEvent, type FormEvent } from 'react';
 import {AuthorizationStatus} from '../../const';
-import { IReview } from '../../types/types';
+import { CommentData, IReview } from '../../types/types';
 import { IUser } from '../../types/user';
 
-import { useAppSelector } from '../../hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getAuthStatus, getUser } from '../../store/user/selectors';
-import { getOffer } from '../../store/offers/selectors';
+import { getOffer, getOfferReviews } from '../../store/offers/selectors';
+import { addCommentAction, fetchCommentsAction } from '../../store/apiActions';
 
 
 type ReviewsProps = {
@@ -59,11 +60,14 @@ const Review = ({ review }: ReviewsProps) => {
 
 const UserReviews = () => {
 
+  const dispatch = useAppDispatch();
+
   const authStatus = useAppSelector(getAuthStatus);
   const user = useAppSelector(getUser);
   const userLogged = authStatus === AuthorizationStatus.Auth && user;
 
-  const { reviews } = useAppSelector(getOffer);
+  const offer = useAppSelector(getOffer);
+  const reviews = useAppSelector(getOfferReviews);
 
   const [newReview, setNewReview] = useState<IReview | undefined>(() => getDefaultReview(user));
   const [isValidReview, setIsValidReview] = useState<boolean>(false);
@@ -96,8 +100,23 @@ const UserReviews = () => {
     }
   };
 
-  const handleClickSubmit = (e: FormEvent) => {
+  const onSubmit = (data: CommentData) => {
+    dispatch(addCommentAction(data));
+    dispatch(fetchCommentsAction(data.placeId));
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (newReview && offer) {
+      onSubmit({
+        placeId: offer.id,
+        comment: {
+          comment: newReview.comment,
+          rating: newReview.rating
+        }
+      });
+    }
     setNewReview(getDefaultReview(user));
   };
 
@@ -140,7 +159,10 @@ const UserReviews = () => {
         {reviews.map((review) => <Review key={review.id} review={review}></Review>)}
       </ul>
       {userLogged &&
-        <form className="reviews__form form" action="#" method="post">
+        <form
+          className="reviews__form form"
+          onSubmit={handleSubmit}
+        >
           <label className="reviews__label form__label" htmlFor="review">Your review</label>
           <div className="reviews__rating-form form__rating">
             {mapRatingStars()}
@@ -150,7 +172,7 @@ const UserReviews = () => {
             <p className="reviews__help">
               To submit review please make sure to set <span className="reviews__star">rating</span> and describe your stay with at least <span className="reviews__text-amount">50 characters</span>.
             </p>
-            <button className="reviews__submit form__submit button" type="submit" disabled={!isValidReview} onClick={handleClickSubmit}>Submit</button>
+            <button className="reviews__submit form__submit button" type="submit" disabled={!isValidReview}>Submit</button>
           </div>
         </form>}
     </section>

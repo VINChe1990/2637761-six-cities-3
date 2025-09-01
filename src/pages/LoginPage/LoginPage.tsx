@@ -3,14 +3,16 @@ import { Link} from 'react-router-dom';
 import { AppRoute } from '../../const';
 import { loginAction } from '../../store/apiActions';
 import { AuthData } from '../../types/user';
-import { store } from '../../store';
+import { useAppDispatch } from '../../hooks';
 
 const LoginPage = () => {
+  const dispatch = useAppDispatch();
+
   const loginRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
-  const onSubmit = async (authData: AuthData) => {
-    await store.dispatch(loginAction(authData));
+  const onSubmit = (authData: AuthData) => {
+    dispatch(loginAction(authData));
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {

@@ -41,3 +41,8 @@ export enum PlaceViewType {
   Cities = 'cities',
   NearPlaces = 'near-places',
 }
+
+export enum FavoriteStatus {
+  Added = 1,
+  Removed = 0
+}

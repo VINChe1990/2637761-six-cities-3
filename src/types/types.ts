@@ -1,5 +1,5 @@
 import { City } from './city';
-import { IPlace } from './place';
+import { FavoriteStatus, IPlace } from './place';
 import { IUser } from './user';
 
 export type Location = {
@@ -8,13 +8,37 @@ export type Location = {
   zoom: number;
 }
 
-export interface IReview {
-  id: string;
-  date: string;
-  user: IUser;
+export interface IComment {
   comment: string;
   rating: number;
 }
+
+export interface IReview extends IComment {
+  id: string;
+  date: string;
+  user: IUser;
+}
+
+export type CommentData = {
+  placeId: string;
+  comment: IComment;
+};
+
+export type ChangeFavoriteData = {
+  placeId: string;
+  status: FavoriteStatus;
+};
+
+export type ChangeFavoriteResult = {
+  status: FavoriteStatus;
+  place: IPlace;
+};
+
+export enum FavoriteButtonViewType {
+  PlaceCard = 'place-card',
+  Offer = 'offer',
+}
+
 
 export type MapProps = {
   viewType: MapViewType;
