@@ -1,35 +1,31 @@
-import {Link, useNavigate} from 'react-router-dom';
-import {AppRoute, AuthorizationStatus} from '../../const';
+import { Link, useNavigate } from 'react-router-dom';
+import { AppRoute } from '../../const';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getAuthStatus, getUser } from '../../store/user/selectors';
+import { getUser, getUserLogged } from '../../store/user/selectors';
 import { getFavoritesCount } from '../../store/favorites/selectors';
 import { logoutAction } from '../../store/apiActions';
+import { useCallback, useMemo } from 'react';
 
 const Header = () => {
-  let email = '';
-  let avatarUrl = '';
-
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const authStatus = useAppSelector(getAuthStatus);
-  const userLogged = authStatus === AuthorizationStatus.Auth;
-
-  const user = useAppSelector(getUser);
   const favoriteCount = useAppSelector(getFavoritesCount);
+  const user = useAppSelector(getUser);
+  const userLogged = useAppSelector(getUserLogged);
 
-  if (userLogged && user){
-    email = user.email;
-    avatarUrl = user.avatarUrl;
-  }
+  const { email, avatarUrl } = useMemo(() => ({
+    email: userLogged && user ? user.email : '',
+    avatarUrl: userLogged && user ? user.avatarUrl : ''
+  }), [userLogged, user]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     dispatch(logoutAction());
-  };
+  }, [dispatch]);
 
-  const handleNavigateToFavorites = () => {
+  const handleNavigateToFavorites = useCallback(() => {
     navigate(AppRoute.Favorites);
-  };
+  }, [navigate]);
 
   return (
     <header className="header">

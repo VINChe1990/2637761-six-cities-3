@@ -1,53 +1,63 @@
-import {useEffect, useRef} from 'react';
-import leaflet, {LayerGroup} from 'leaflet';
+import { useEffect, useRef } from 'react';
+import { icon, layerGroup, marker } from 'leaflet';
+import { LayerGroup, Marker } from 'leaflet';
+import { useMap } from '../../hooks/useMap';
+import { MapProps } from '../../types/types';
+import { useAppSelector } from '../../hooks';
+import { getActivePlaceId } from '../../store/offers/selectors';
+
 import 'leaflet/dist/leaflet.css';
 
-import {useMap} from '../../hooks/useMap';
-import {MapProps} from '../../types/types';
-
-const defaultIcon = leaflet.icon({
+const defaultIcon = icon({
   iconUrl: './img/pin.svg',
   iconSize: [28, 40],
   iconAnchor: [14, 40],
 });
 
-const activeIcon = leaflet.icon({
+const activeIcon = icon({
   iconUrl: './img/pin-active.svg',
   iconSize: [28, 40],
   iconAnchor: [14, 40],
 });
 
-const PlaceMap = ({ viewType, city, places, selectedPlace}: MapProps) => {
+const PlaceMap = ({ viewType, city, places }: MapProps) => {
   const mapRef = useRef<HTMLElement>(null);
   const map = useMap(mapRef);
-  const markerLayerRef = useRef<LayerGroup>(leaflet.layerGroup());
+  const markerLayerRef = useRef<LayerGroup>(layerGroup());
+  const markersRef = useRef<Map<string, Marker>>(new Map());
 
-  useEffect(() => {
-    if (map !== null) {
-      map.setView([city.location.latitude, city.location.longitude], city.location.zoom);
-      markerLayerRef.current.addTo(map);
-    }
-  }, [map, city]);
+  const activePlaceId = useAppSelector(getActivePlaceId);
 
   useEffect(() => {
     if (map) {
+      map.setView([city.location.latitude, city.location.longitude], city.location.zoom);
+      markerLayerRef.current.addTo(map);
       markerLayerRef.current.clearLayers();
 
+      markersRef.current.clear();
+
       places.forEach((place) => {
-        leaflet
-          .marker(
-            {
-              lat: place.location.latitude,
-              lng: place.location.longitude,
-            },
-            {
-              icon: place.id === selectedPlace ? activeIcon : defaultIcon,
-            }
-          )
-          .addTo(markerLayerRef.current);
+        const markerItem = marker(
+          {
+            lat: place.location.latitude,
+            lng: place.location.longitude,
+          },
+          {
+            icon: defaultIcon,
+          }
+        );
+
+        markersRef.current.set(place.id, markerItem);
+        markerItem.addTo(markerLayerRef.current);
       });
     }
-  }, [map, places, selectedPlace]);
+  }, [map, city, places]);
+
+  useEffect(() => {
+    if (markersRef.current.size > 0) {
+      markersRef.current.forEach((item, placeId) => item.setIcon(placeId === activePlaceId ? activeIcon : defaultIcon));
+    }
+  }, [activePlaceId]);
 
   return (
     <section

@@ -1,8 +1,8 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {OffersState} from '../../types/store';
-import {fetchOffersAction, fetchOfferViewAction, fetchFavoritesAction, fetchCommentsAction} from '../../store/apiActions';
-import {cityData, getCityByName, getDefaultCity} from '../../store/CityData/CityData';
-import {SliceSpace} from '../../types/types';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { OffersState } from '../../types/store';
+import { fetchOffersAction, fetchOfferViewAction, fetchFavoritesAction, fetchCommentsAction } from '../../store/apiActions';
+import { cityData, getCityByName, getDefaultCity } from '../../store/CityData/CityData';
+import { SliceSpace } from '../../types/types';
 import { SortType } from '../../const';
 import { CONFIG } from '../../config/appConfig';
 
@@ -14,6 +14,7 @@ const initialState: OffersState = {
   allPlaces: [],
   cityPlaces: [],
   cityPlacesCount: 0,
+  activePlaceId: '',
   sortType: CONFIG.defaultSortType,
   offerView: {
     offer: undefined,
@@ -31,11 +32,14 @@ export const offers = createSlice({
   reducers: {
     setCity: (state, action: PayloadAction<string>) => {
       state.city = getCity(action.payload);
-      state.cityPlaces = [...state.allPlaces.filter((r) => r.city.name === state.city.name)];
+      state.cityPlaces = [...state.allPlaces.filter((r) => r.city.name === state.city.name).slice(0, 3)];
       state.cityPlacesCount = state.cityPlaces.length;
     },
     setSortType: (state, action: PayloadAction<SortType>) => {
       state.sortType = action.payload;
+    },
+    setActivePlaceId: (state, action: PayloadAction<string | undefined>) => {
+      state.activePlaceId = action.payload ?? 'unknown';
     }
   },
   extraReducers(builder) {
@@ -46,7 +50,7 @@ export const offers = createSlice({
       })
       .addCase(fetchOffersAction.fulfilled, (state, action) => {
         state.allPlaces = action.payload;
-        state.cityPlaces = [...state.allPlaces.filter((r) => r.city.name === state.city.name)];
+        state.cityPlaces = [...state.allPlaces.filter((r) => r.city.name === state.city.name).slice(0, 3)];
         state.cityPlacesCount = state.cityPlaces.length;
         state.dataLoading = false;
       })
@@ -90,4 +94,4 @@ export const offers = createSlice({
   }
 });
 
-export const {setCity, setSortType} = offers.actions;
+export const {setCity, setSortType, setActivePlaceId} = offers.actions;

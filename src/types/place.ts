@@ -33,7 +33,6 @@ export type OfferView = {
 export type PlaceCardProps = {
   viewType: PlaceViewType;
   place: IPlace;
-  onHover?: (place?: IPlace) => void;
 }
 
 export enum PlaceViewType {

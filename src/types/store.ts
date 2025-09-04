@@ -11,6 +11,7 @@ export type OffersState = {
   allPlaces: IPlace[];
   cityPlaces: IPlace[];
   cityPlacesCount: number;
+  activePlaceId: string;
   sortType: SortType;
   offerView: OfferView;
   favorites: IPlace[];

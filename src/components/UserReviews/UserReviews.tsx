@@ -1,31 +1,12 @@
-import { useState, useEffect, Fragment } from 'react';
-import { type ChangeEvent, type FormEvent } from 'react';
-import {AuthorizationStatus} from '../../const';
-import { CommentData, IReview } from '../../types/types';
-import { IUser } from '../../types/user';
-
-import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getAuthStatus, getUser } from '../../store/user/selectors';
-import { getOffer, getOfferReviews } from '../../store/offers/selectors';
-import { addCommentAction, fetchCommentsAction } from '../../store/apiActions';
-
+import { useMemo } from 'react';
+import { IReview } from '../../types/types';
+import { useAppSelector } from '../../hooks';
+import { getOfferReviews } from '../../store/offers/selectors';
+import ReviewForm from '../ReviewForm';
 
 type ReviewsProps = {
   review: IReview;
 }
-
-const getDefaultReview = (user?: IUser): IReview | undefined => {
-  if (user){
-    return {
-      id: '',
-      comment: '',
-      date: '',
-      rating: 0,
-      user: user
-    };
-  }
-  return undefined;
-};
 
 const Review = ({ review }: ReviewsProps) => {
   const date = new Date(review.date);
@@ -59,122 +40,16 @@ const Review = ({ review }: ReviewsProps) => {
 };
 
 const UserReviews = () => {
-
-  const dispatch = useAppDispatch();
-
-  const authStatus = useAppSelector(getAuthStatus);
-  const user = useAppSelector(getUser);
-  const userLogged = authStatus === AuthorizationStatus.Auth && user;
-
-  const offer = useAppSelector(getOffer);
   const reviews = useAppSelector(getOfferReviews);
-
-  const [newReview, setNewReview] = useState<IReview | undefined>(() => getDefaultReview(user));
-  const [isValidReview, setIsValidReview] = useState<boolean>(false);
-
-  useEffect(() => {
-    let isValid = true;
-
-    if (newReview && newReview.rating === 0) {
-      isValid = false;
-    }
-
-    if (newReview && newReview.comment.length < 50) {
-      isValid = false;
-    }
-
-    setIsValidReview(isValid);
-  }, [newReview]);
-
-  const handleRatingChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(event.target.value);
-    if (newReview) {
-      setNewReview({...newReview, rating: value});
-    }
-  };
-
-  const handleCommentChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    const {value} = event.target;
-    if (newReview) {
-      setNewReview({...newReview, comment: value});
-    }
-  };
-
-  const onSubmit = (data: CommentData) => {
-    dispatch(addCommentAction(data));
-    dispatch(fetchCommentsAction(data.placeId));
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (newReview && offer) {
-      onSubmit({
-        placeId: offer.id,
-        comment: {
-          comment: newReview.comment,
-          rating: newReview.rating
-        }
-      });
-    }
-    setNewReview(getDefaultReview(user));
-  };
-
-  const mapRatingStars = () => [1, 2, 3, 4, 5].reverse().map((rating) => {
-    let title = '';
-    switch (rating) {
-      case 1:
-        title = 'terribly';
-        break;
-      case 2:
-        title = 'badly';
-        break;
-      case 3:
-        title = 'not bad';
-        break;
-      case 4:
-        title = 'good';
-        break;
-      case 5:
-        title = 'perfect';
-        break;
-    }
-
-    return (
-      <Fragment key={rating}>
-        <input className="form__rating-input visually-hidden" name="rating" value={rating} id={`${rating}-stars`} type="radio" onChange={handleRatingChange} checked={newReview?.rating === rating}/>
-        <label htmlFor={`${rating}-stars`} className="reviews__rating-label form__rating-label" title={title}>
-          <svg className="form__star-image" width="37" height="33">
-            <use xlinkHref="#icon-star"></use>
-          </svg>
-        </label>
-      </Fragment>
-    );
-  });
+  const reviewList = useMemo(() => reviews.map((review) => <Review key={review.id} review={review}></Review>), [reviews]);
 
   return (
     <section className="offer__reviews reviews">
       <h2 className="reviews__title">Reviews &middot; <span className="reviews__amount">{reviews.length}</span></h2>
       <ul className="reviews__list">
-        {reviews.map((review) => <Review key={review.id} review={review}></Review>)}
+        {reviewList}
       </ul>
-      {userLogged &&
-        <form
-          className="reviews__form form"
-          onSubmit={handleSubmit}
-        >
-          <label className="reviews__label form__label" htmlFor="review">Your review</label>
-          <div className="reviews__rating-form form__rating">
-            {mapRatingStars()}
-          </div>
-          <textarea className="reviews__textarea form__textarea" id="review" name="review" placeholder="Tell how was your stay, what you like and what can be improved" onChange={handleCommentChange} value={newReview?.comment}></textarea>
-          <div className="reviews__button-wrapper">
-            <p className="reviews__help">
-              To submit review please make sure to set <span className="reviews__star">rating</span> and describe your stay with at least <span className="reviews__text-amount">50 characters</span>.
-            </p>
-            <button className="reviews__submit form__submit button" type="submit" disabled={!isValidReview}>Submit</button>
-          </div>
-        </form>}
+      <ReviewForm />
     </section>
   );
 };

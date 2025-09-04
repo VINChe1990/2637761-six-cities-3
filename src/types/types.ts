@@ -44,7 +44,6 @@ export type MapProps = {
   viewType: MapViewType;
   city: City;
   places: IPlace[];
-  selectedPlace: string;
 }
 
 export enum MapViewType {

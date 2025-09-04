@@ -1,20 +1,19 @@
-import {useParams} from 'react-router-dom';
-import {useState, useEffect} from 'react';
-
-import '../../styles/main.css';
-import Header from '../../components/Header/Header';
-import {FavoriteButtonViewType, MapViewType} from '../../types/types';
-import { IPlace, PlaceViewType } from '../../types/place';
-import UserReviews from '../../components/UserReviews/UserReviews';
-import PlaceCard from '../../components/PlaceCard/PlaceCard';
-import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
-import PlaceMap from '../../components/PlaceMap/PlaceMap';
-import Loader from '../../components/Loader/Loader';
-
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { FavoriteButtonViewType, MapViewType } from '../../types/types';
+import { PlaceViewType } from '../../types/place';
 import { fetchOfferViewAction } from '../../store/apiActions';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getDataIsLoading, getOffer, getOfferNearPlaces } from '../../store/offers/selectors';
-import FavoriteButton from '../../components/FavoriteButton/FavoriteButton';
+import { offerPageSelector } from '../../store/offers/selectors';
+import Header from '../../components/Header';
+import UserReviews from '../../components/UserReviews';
+import PlaceCard from '../../components/PlaceCard';
+import NotFoundPage from '../../pages/NotFoundPage';
+import PlaceMap from '../../components/PlaceMap';
+import FavoriteButton from '../../components/FavoriteButton';
+import Loader from '../../components/Loader';
+
+import '../../styles/main.css';
 
 type OfferRouteParams = {
   id: string;
@@ -23,20 +22,19 @@ type OfferRouteParams = {
 const OfferPage = () => {
   const dispatch = useAppDispatch();
 
-  const [activeCard, setActiveCard] = useState<IPlace>();
-
-  const dataIsLoading = useAppSelector(getDataIsLoading);
-  const currentOffer = useAppSelector(getOffer);
-  const nearPlaces = useAppSelector(getOfferNearPlaces);
+  const [isLoading, setIsLoading] = useState(true);
+  const { currentOffer, nearPlaces } = useAppSelector(offerPageSelector);
 
   const urlParams = useParams<OfferRouteParams>();
   const placeId = urlParams.id ?? '';
 
   useEffect(() => {
-    dispatch(fetchOfferViewAction(placeId));
+    dispatch(fetchOfferViewAction(placeId)).then(() => {
+      setIsLoading(false);
+    });
   }, [dispatch, placeId]);
 
-  if (dataIsLoading) {
+  if (isLoading) {
     return (
       <Loader />
     );
@@ -47,11 +45,6 @@ const OfferPage = () => {
   }
 
   const { images, isPremium, title, rating, price, type, bedrooms, maxAdults, goods, host, description, city } = currentOffer;
-
-
-  const handlePlaceCardHover = (place?: IPlace) => {
-    setActiveCard(place);
-  };
 
   return (
     <div className="page">
@@ -137,13 +130,13 @@ const OfferPage = () => {
               <UserReviews/>
             </div>
           </div>
-          <PlaceMap viewType={MapViewType.Offer} city={city} places={nearPlaces} selectedPlace={activeCard?.id ?? 'unknown'}/>
+          <PlaceMap viewType={MapViewType.Offer} city={city} places={nearPlaces}/>
         </section>
         <div className="container">
           <section className="near-places places">
             <h2 className="near-places__title">Other places in the neighbourhood</h2>
             <div className="near-places__list places__list">
-              {nearPlaces.map((place) => <PlaceCard key={place.id} viewType={PlaceViewType.NearPlaces} place={place} onHover={handlePlaceCardHover}></PlaceCard>)}
+              {nearPlaces.map((place) => <PlaceCard key={place.id} viewType={PlaceViewType.NearPlaces} place={place}></PlaceCard>)}
             </div>
           </section>
         </div>

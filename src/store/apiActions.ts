@@ -1,8 +1,6 @@
-import {AxiosInstance} from 'axios';
-import {AppDispatch, State} from '../types/store';
-import {redirectToRoute} from './actions';
-import {saveToken, dropToken} from '../services/token';
-import {APIRoute, AppRoute} from '../const';
+import { redirectToRoute } from './actions';
+import { saveToken, dropToken } from '../services/token';
+import { APIRoute, AppRoute } from '../const';
 import { IOffer, IPlace, OfferView } from '../types/place';
 import { AuthData, ISiteUser } from '../types/user';
 import { ChangeFavoriteData, ChangeFavoriteResult, CommentData, IReview } from '../types/types';
@@ -81,11 +79,7 @@ export const checkAuthAction = createAppAsyncThunk<ISiteUser, undefined>(
   }
 );
 
-export const loginAction = createAppAsyncThunk<ISiteUser, AuthData, {
-  dispatch: AppDispatch;
-  state: State;
-  extra: AxiosInstance;
-}>(
+export const loginAction = createAppAsyncThunk<ISiteUser, AuthData>(
   'login',
   async ({login: email, password}, { dispatch, extra: api }) => {
     const { data } = await api.post<ISiteUser>(APIRoute.Login, {email, password});
@@ -105,3 +99,4 @@ export const logoutAction = createAppAsyncThunk<void, undefined>(
     dispatch(checkAuthAction());
   }
 );
+
