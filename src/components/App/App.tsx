@@ -6,7 +6,7 @@ import MainPage from '../../pages/MainPage/MainPage';
 import LoginPage from '../../pages/LoginPage/LoginPage';
 import OfferPage from '../../pages/OfferPage/OfferPage';
 import FavoritesPage from '../../pages/FavoritesPage/FavoritesPage';
-import PrivateRoute from '../PrivateRote/PrivateRoute';
+import PrivateRoute from '../PrivateRoute/PrivateRoute';
 import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
 import { useAppDispatch } from '../../hooks';
 import { fetchOffersAction, checkAuthAction } from '../../store/apiActions';
