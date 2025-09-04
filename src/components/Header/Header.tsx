@@ -1,15 +1,15 @@
 import {Link, useNavigate} from 'react-router-dom';
 import {AppRoute, AuthorizationStatus} from '../../const';
-import { useAppSelector } from '../../hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getAuthStatus, getUser } from '../../store/user/selectors';
 import { getFavoritesCount } from '../../store/favorites/selectors';
 import { logoutAction } from '../../store/apiActions';
-import { store } from '../../store';
 
 const Header = () => {
   let email = '';
   let avatarUrl = '';
 
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const authStatus = useAppSelector(getAuthStatus);
@@ -24,7 +24,7 @@ const Header = () => {
   }
 
   const handleLogout = () => {
-    store.dispatch(logoutAction());
+    dispatch(logoutAction());
   };
 
   const handleNavigateToFavorites = () => {

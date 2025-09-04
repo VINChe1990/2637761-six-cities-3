@@ -1,10 +1,9 @@
 import {useParams} from 'react-router-dom';
 import {useState, useEffect} from 'react';
-import classNames from 'classnames';
 
 import '../../styles/main.css';
 import Header from '../../components/Header/Header';
-import {MapViewType} from '../../types/types';
+import {FavoriteButtonViewType, MapViewType} from '../../types/types';
 import { IPlace, PlaceViewType } from '../../types/place';
 import UserReviews from '../../components/UserReviews/UserReviews';
 import PlaceCard from '../../components/PlaceCard/PlaceCard';
@@ -12,30 +11,30 @@ import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
 import PlaceMap from '../../components/PlaceMap/PlaceMap';
 import Loader from '../../components/Loader/Loader';
 
-import { store } from '../../store';
 import { fetchOfferViewAction } from '../../store/apiActions';
-import { useAppSelector } from '../../hooks';
-import { getDataIsLoading, getOffer } from '../../store/offers/selectors';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { getDataIsLoading, getOffer, getOfferNearPlaces } from '../../store/offers/selectors';
+import FavoriteButton from '../../components/FavoriteButton/FavoriteButton';
 
 type OfferRouteParams = {
   id: string;
 };
 
 const OfferPage = () => {
+  const dispatch = useAppDispatch();
+
   const [activeCard, setActiveCard] = useState<IPlace>();
 
   const dataIsLoading = useAppSelector(getDataIsLoading);
-  const {offer: currentOffer, nearPlaces } = useAppSelector(getOffer);
+  const currentOffer = useAppSelector(getOffer);
+  const nearPlaces = useAppSelector(getOfferNearPlaces);
 
   const urlParams = useParams<OfferRouteParams>();
   const placeId = urlParams.id ?? '';
 
   useEffect(() => {
-    const fetchOfferById = async () => {
-      await store.dispatch(fetchOfferViewAction(placeId));
-    };
-    fetchOfferById();
-  }, [placeId]);
+    dispatch(fetchOfferViewAction(placeId));
+  }, [dispatch, placeId]);
 
   if (dataIsLoading) {
     return (
@@ -47,20 +46,12 @@ const OfferPage = () => {
     return <NotFoundPage />;
   }
 
-  const { images, isPremium, title, isFavorite, rating, price, type, bedrooms, maxAdults, goods, host, description, city } = currentOffer;
+  const { images, isPremium, title, rating, price, type, bedrooms, maxAdults, goods, host, description, city } = currentOffer;
 
 
   const handlePlaceCardHover = (place?: IPlace) => {
     setActiveCard(place);
   };
-
-  const bookmarkClass = classNames(
-    'button',
-    'offer__bookmark-button',
-    {
-      'offer__bookmark-button--active': isFavorite
-    }
-  );
 
   return (
     <div className="page">
@@ -87,12 +78,7 @@ const OfferPage = () => {
                 <h1 className="offer__name">
                   {title}
                 </h1>
-                <button className={bookmarkClass} type="button">
-                  <svg className="offer__bookmark-icon" width="31" height="33">
-                    <use xlinkHref="#icon-bookmark"></use>
-                  </svg>
-                  <span className="visually-hidden">${isFavorite ? 'In' : 'To'}To bookmarks</span>
-                </button>
+                <FavoriteButton placeId={placeId} viewType={FavoriteButtonViewType.Offer}/>
               </div>
               <div className="offer__rating rating">
                 <div className="offer__stars rating__stars">

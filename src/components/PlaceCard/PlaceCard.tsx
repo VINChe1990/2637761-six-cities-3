@@ -4,9 +4,11 @@ import {AppRoute} from '../../const';
 import {PlaceCardProps, PlaceViewType} from '../../types/place';
 
 import '../../styles/main.css';
+import FavoriteButton from '../FavoriteButton/FavoriteButton';
+import { FavoriteButtonViewType } from '../../types/types';
 
 const PlaceCard = ({ viewType, place, onHover }: PlaceCardProps) => {
-  const { id, isPremium, isFavorite, rating, previewImage, price, type, title } = place;
+  const { id, isPremium, rating, previewImage, price, type, title } = place;
 
   const linkRoute = AppRoute.Offer.replace(':id', id.toString());
 
@@ -29,14 +31,6 @@ const PlaceCard = ({ viewType, place, onHover }: PlaceCardProps) => {
     }
   );
 
-  const bookmarkClass = classNames(
-    'button',
-    'place-card__bookmark-button',
-    {
-      'place-card__bookmark-button--active': isFavorite
-    }
-  );
-
   return (
     <article className={`${viewType}__card place-card`} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       {isPremium &&
@@ -54,12 +48,7 @@ const PlaceCard = ({ viewType, place, onHover }: PlaceCardProps) => {
             <span className="place-card__price-value">&euro;{price}</span>
             <span className="place-card__price-text">&#47;&nbsp;night</span>
           </div>
-          <button className={bookmarkClass} type="button">
-            <svg className="place-card__bookmark-icon" width="18" height="19">
-              <use xlinkHref="#icon-bookmark"></use>
-            </svg>
-            <span className="visually-hidden">${isFavorite ? 'In' : 'To'}To bookmarks</span>
-          </button>
+          <FavoriteButton placeId={id} viewType={FavoriteButtonViewType.PlaceCard}/>
         </div>
         <div className="place-card__rating rating">
           <div className="place-card__stars rating__stars">
