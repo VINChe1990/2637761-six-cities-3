@@ -1,10 +1,11 @@
+import { useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+
 import { AppRoute } from '../../const';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getUser, getUserLogged } from '../../store/user/selectors';
 import { getFavoritesCount } from '../../store/favorites/selectors';
 import { logoutAction } from '../../store/apiActions';
-import { useCallback, useMemo } from 'react';
 
 const Header = () => {
   const dispatch = useAppDispatch();
@@ -15,8 +16,8 @@ const Header = () => {
   const userLogged = useAppSelector(getUserLogged);
 
   const { email, avatarUrl } = useMemo(() => ({
-    email: userLogged && user ? user.email : '',
-    avatarUrl: userLogged && user ? user.avatarUrl : ''
+    email: userLogged && user ? user.email : '<empty>',
+    avatarUrl: userLogged && user ? user.avatarUrl : undefined
   }), [userLogged, user]);
 
   const handleLogout = useCallback(() => {
@@ -42,7 +43,8 @@ const Header = () => {
                 {userLogged ? (
                   <a className="header__nav-link header__nav-link--profile">
                     <div className="header__avatar-wrapper user__avatar-wrapper">
-                      <img className="header__avatar-wrapper user__avatar" src={avatarUrl} alt="Аватар пользователя" width="54" height="54"/>
+                      {avatarUrl &&
+                        <img className="header__avatar-wrapper user__avatar" src={avatarUrl} alt="Аватар пользователя" width="54" height="54"/>}
                     </div>
                     <span className="header__user-name user__name">{email}</span>
                     <span

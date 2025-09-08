@@ -40,6 +40,8 @@ const ReviewForm = () => {
         }
       };
 
+      setIsValidReview(false);
+
       dispatch(addCommentAction(commentData));
       dispatch(fetchCommentsAction(offerId));
     }

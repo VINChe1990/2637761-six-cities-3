@@ -32,7 +32,7 @@ export const offers = createSlice({
   reducers: {
     setCity: (state, action: PayloadAction<string>) => {
       state.city = getCity(action.payload);
-      state.cityPlaces = [...state.allPlaces.filter((r) => r.city.name === state.city.name).slice(0, 3)];
+      state.cityPlaces = [...state.allPlaces.filter((r) => r.city.name === state.city.name)];
       state.cityPlacesCount = state.cityPlaces.length;
     },
     setSortType: (state, action: PayloadAction<SortType>) => {
@@ -50,7 +50,7 @@ export const offers = createSlice({
       })
       .addCase(fetchOffersAction.fulfilled, (state, action) => {
         state.allPlaces = action.payload;
-        state.cityPlaces = [...state.allPlaces.filter((r) => r.city.name === state.city.name).slice(0, 3)];
+        state.cityPlaces = [...state.allPlaces.filter((r) => r.city.name === state.city.name)];
         state.cityPlacesCount = state.cityPlaces.length;
         state.dataLoading = false;
       })

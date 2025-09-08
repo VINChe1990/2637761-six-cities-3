@@ -17,7 +17,8 @@ const Review = ({ review }: ReviewsProps) => {
     <li className="reviews__item">
       <div className="reviews__user user">
         <div className="reviews__avatar-wrapper user__avatar-wrapper">
-          <img className="reviews__avatar user__avatar" src={review.user.avatarUrl} width="54" height="54" alt="Аватар пользователя"/>
+          {review.user.avatarUrl &&
+            <img className="reviews__avatar user__avatar" src={review.user.avatarUrl} width="54" height="54" alt="Аватар пользователя"/>}
         </div>
         <span className="reviews__user-name">
           {review.user.name}
@@ -41,7 +42,7 @@ const Review = ({ review }: ReviewsProps) => {
 
 const UserReviews = () => {
   const reviews = useAppSelector(getOfferReviews);
-  const reviewList = useMemo(() => reviews.map((review) => <Review key={review.id} review={review}></Review>), [reviews]);
+  const reviewList = useMemo(() => reviews.map((review) => <Review key={review.id} review={review}/>), [reviews]);
 
   return (
     <section className="offer__reviews reviews">

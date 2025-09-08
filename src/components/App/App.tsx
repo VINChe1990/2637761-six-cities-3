@@ -1,15 +1,15 @@
 import { Route, Routes } from 'react-router-dom';
 import { useEffect } from 'react';
-import { AppRoute } from '../../const';
 
+import { AppRoute } from '../../const';
+import { useAppDispatch } from '../../hooks';
+import { fetchOffersAction, checkAuthAction } from '../../store/apiActions';
 import MainPage from '../../pages/MainPage/MainPage';
 import LoginPage from '../../pages/LoginPage/LoginPage';
 import OfferPage from '../../pages/OfferPage/OfferPage';
 import FavoritesPage from '../../pages/FavoritesPage/FavoritesPage';
 import PrivateRoute from '../PrivateRoute/PrivateRoute';
 import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
-import { useAppDispatch } from '../../hooks';
-import { fetchOffersAction, checkAuthAction } from '../../store/apiActions';
 
 const App = () => {
   const dispatch = useAppDispatch();

@@ -1,16 +1,16 @@
+import { useCallback, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import classNames from 'classnames';
-
 import '../../styles/main.css';
+
 import { getIsFavorite } from '../../store/favorites/selectors';
+import { getUserLogged } from '../../store/user/selectors';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { changeFavoriteAction } from '../../store/apiActions';
 import { FavoriteStatus } from '../../types/place';
 import { FavoriteButtonViewType } from '../../types/types';
-import { getUserLogged } from '../../store/user/selectors';
-import { ICON_SIZES } from '../../const';
-import { useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { State } from '../../types/store';
+import { ICON_SIZES } from '../../const';
 
 type FavoriteButtonProps = {
   placeId: string;
@@ -19,8 +19,9 @@ type FavoriteButtonProps = {
 
 const FavoriteButton = ({ placeId, viewType }: FavoriteButtonProps) => {
   const userLogged = useAppSelector(getUserLogged);
-
   const dispatch = useAppDispatch();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const selectIsFavorite = useCallback(
     (state: State) => getIsFavorite(state, placeId),
@@ -29,10 +30,14 @@ const FavoriteButton = ({ placeId, viewType }: FavoriteButtonProps) => {
   const isFavorite = useSelector(selectIsFavorite);
 
   const handleChangeFavorite = useCallback(() => {
+    setIsLoading(true);
+
     dispatch(changeFavoriteAction({
       placeId: placeId,
       status: isFavorite ? FavoriteStatus.Removed : FavoriteStatus.Added
-    }));
+    })).then(() => {
+      setIsLoading(false);
+    });
   }, [dispatch, placeId, isFavorite]);
 
   const { bookmarkClassName: bookmarkClass, iconClassName: iconClass, width: iconWidth, height: iconHeight, buttonLabelText: buttonLabel } = useMemo(() => {
@@ -65,6 +70,7 @@ const FavoriteButton = ({ placeId, viewType }: FavoriteButtonProps) => {
     <button
       className={bookmarkClass}
       type="button"
+      disabled={isLoading}
       onClick={handleChangeFavorite}
     >
       <svg
