@@ -61,9 +61,7 @@ const FavoriteButton = ({ placeId, viewType }: FavoriteButtonProps) => {
   }, [viewType, isFavorite]);
 
   if (!userLogged){
-    return (
-      <>
-      </>);
+    return null;
   }
 
   return (

@@ -52,10 +52,7 @@ const ReviewForm = () => {
   };
 
   if (!userLogged){
-    return (
-      <>
-      </>
-    );
+    return null;
   }
 
   return (
