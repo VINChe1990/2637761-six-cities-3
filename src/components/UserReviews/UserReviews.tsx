@@ -1,8 +1,11 @@
 import { useMemo } from 'react';
+import classNames from 'classnames';
+
 import { IReview } from '../../types/types';
 import { useAppSelector } from '../../hooks';
 import { getOfferReviews } from '../../store/offers/selectors';
 import ReviewForm from '../ReviewForm';
+import ImageWithFallback from '../ImageWithFallback';
 
 type ReviewsProps = {
   review: IReview;
@@ -12,13 +15,20 @@ const Review = ({ review }: ReviewsProps) => {
   const date = new Date(review.date);
   const dateTime = date.toISOString();
   const formattedDate = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  const starClassName = classNames(`raiting-${Math.round(review.rating)}-star`);
 
   return (
     <li className="reviews__item">
       <div className="reviews__user user">
         <div className="reviews__avatar-wrapper user__avatar-wrapper">
-          {review.user.avatarUrl &&
-            <img className="reviews__avatar user__avatar" src={review.user.avatarUrl} width="54" height="54" alt="Аватар пользователя"/>}
+          <ImageWithFallback
+            className="reviews__avatar user__avatar"
+            src={review.user.avatarUrl}
+            fallbackSrc={'img/avatar.svg'}
+            width="54"
+            height="54"
+            alt="Аватар пользователя"
+          />
         </div>
         <span className="reviews__user-name">
           {review.user.name}
@@ -27,7 +37,7 @@ const Review = ({ review }: ReviewsProps) => {
       <div className="reviews__info">
         <div className="reviews__rating rating">
           <div className="reviews__stars rating__stars">
-            <span className={`raiting-${Math.round(review.rating)}-star`}></span>
+            <span className={starClassName}></span>
             <span className="visually-hidden">Rating</span>
           </div>
         </div>

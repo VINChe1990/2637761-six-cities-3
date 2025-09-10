@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getUser, getUserLogged } from '../../store/user/selectors';
 import { getFavoritesCount } from '../../store/favorites/selectors';
 import { logoutAction } from '../../store/apiActions';
+import ImageWithFallback from '../ImageWithFallback';
 
 const Header = () => {
   const dispatch = useAppDispatch();
@@ -43,8 +44,14 @@ const Header = () => {
                 {userLogged ? (
                   <a className="header__nav-link header__nav-link--profile">
                     <div className="header__avatar-wrapper user__avatar-wrapper">
-                      {avatarUrl &&
-                        <img className="header__avatar-wrapper user__avatar" src={avatarUrl} alt="Аватар пользователя" width="54" height="54"/>}
+                      <ImageWithFallback
+                        className="header__avatar-wrapper user__avatar"
+                        src={avatarUrl}
+                        fallbackSrc={'img/avatar.svg'}
+                        alt="Аватар пользователя"
+                        width="54"
+                        height="54"
+                      />
                     </div>
                     <span className="header__user-name user__name">{email}</span>
                     <span

@@ -1,21 +1,22 @@
 import { useEffect, useRef } from 'react';
 import { icon, layerGroup, marker } from 'leaflet';
 import { LayerGroup, Marker } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
 import { useMap } from '../../hooks/useMap';
 import { MapProps } from '../../types/types';
 import { useAppSelector } from '../../hooks';
 import { getActivePlaceId } from '../../store/offers/selectors';
 
-import 'leaflet/dist/leaflet.css';
 
 const defaultIcon = icon({
-  iconUrl: './img/pin.svg',
+  iconUrl: 'img/pin.svg',
   iconSize: [28, 40],
   iconAnchor: [14, 40],
 });
 
 const activeIcon = icon({
-  iconUrl: './img/pin-active.svg',
+  iconUrl: 'img/pin-active.svg',
   iconSize: [28, 40],
   iconAnchor: [14, 40],
 });

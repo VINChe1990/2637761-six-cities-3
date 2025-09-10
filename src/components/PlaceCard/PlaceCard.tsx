@@ -1,14 +1,16 @@
 import { useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
+import '../../styles/main.css';
+
 import { AppRoute } from '../../const';
 import { PlaceCardProps, PlaceViewType } from '../../types/place';
 import FavoriteButton from '../FavoriteButton';
 import { FavoriteButtonViewType } from '../../types/types';
 import { useAppDispatch } from '../../hooks';
 import { setActivePlaceId } from '../../store/offers/offers';
+import ImageWithFallback from '../ImageWithFallback';
 
-import '../../styles/main.css';
 
 const PlaceCard = ({ viewType, place }: PlaceCardProps) => {
   const dispatch = useAppDispatch();
@@ -31,6 +33,8 @@ const PlaceCard = ({ viewType, place }: PlaceCardProps) => {
     }
   ), [viewType]);
 
+  const starClassName = classNames(`raiting-${Math.round(rating)}-star`);
+
   return (
     <article
       className={`${viewType}__card place-card`}
@@ -43,9 +47,11 @@ const PlaceCard = ({ viewType, place }: PlaceCardProps) => {
         </div>}
       <div className={`${viewType}__image-wrapper place-card__image-wrapper`}>
         <Link to={linkRoute}>
-          <img
+          <ImageWithFallback
             className="place-card__image"
-            src={previewImage} width="260"
+            src={previewImage}
+            fallbackSrc={'img/placeholder.png'}
+            width="260"
             height="200"
             alt="Фото отеля"
           />
@@ -61,7 +67,7 @@ const PlaceCard = ({ viewType, place }: PlaceCardProps) => {
         </div>
         <div className="place-card__rating rating">
           <div className="place-card__stars rating__stars">
-            <span className={`raiting-${Math.round(rating)}-star`}></span>
+            <span className={starClassName}></span>
             <span className="visually-hidden">Rating</span>
           </div>
         </div>

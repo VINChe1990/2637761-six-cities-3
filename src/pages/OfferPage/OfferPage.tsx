@@ -1,5 +1,8 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import classNames from 'classnames';
+import '../../styles/main.css';
+
 import { FavoriteButtonViewType, MapViewType } from '../../types/types';
 import { PlaceViewType } from '../../types/place';
 import { fetchOfferViewAction } from '../../store/apiActions';
@@ -12,8 +15,8 @@ import NotFoundPage from '../../pages/NotFoundPage';
 import PlaceMap from '../../components/PlaceMap';
 import FavoriteButton from '../../components/FavoriteButton';
 import Loader from '../../components/Loader';
+import ImageWithFallback from '../../components/ImageWithFallback';
 
-import '../../styles/main.css';
 
 type OfferRouteParams = {
   id: string;
@@ -46,6 +49,8 @@ const OfferPage = () => {
 
   const { images, isPremium, title, rating, price, type, bedrooms, maxAdults, goods, host, description, city } = currentOffer;
 
+  const starClassName = classNames(`raiting-${Math.round(rating)}-star`);
+
   return (
     <div className="page">
       <Header />
@@ -56,7 +61,12 @@ const OfferPage = () => {
             <div className="offer__gallery">
               {images.map((url) => (
                 <div key={url} className="offer__image-wrapper">
-                  <img className="offer__image" src={url} alt="Фото отеля"/>
+                  <ImageWithFallback
+                    className="offer__image"
+                    src={url}
+                    fallbackSrc={'img/placeholder.png'}
+                    alt="Фото отеля"
+                  />
                 </div>
               ))}
             </div>
@@ -75,7 +85,7 @@ const OfferPage = () => {
               </div>
               <div className="offer__rating rating">
                 <div className="offer__stars rating__stars">
-                  <span className={`raiting-${Math.round(rating)}-star`}></span>
+                  <span className={starClassName}></span>
                   <span className="visually-hidden">Rating</span>
                 </div>
                 <span className="offer__rating-value rating__value">{rating}</span>
@@ -109,7 +119,14 @@ const OfferPage = () => {
                 <h2 className="offer__host-title">Meet the host</h2>
                 <div className="offer__host-user user">
                   <div className="offer__avatar-wrapper offer__avatar-wrapper--pro user__avatar-wrapper">
-                    <img className="offer__avatar user__avatar" src={host.avatarUrl} width="74" height="74" alt="Аватар владельца"/>
+                    <ImageWithFallback
+                      className="offer__avatar user__avatar"
+                      src={host.avatarUrl}
+                      fallbackSrc={'img/avatar.svg'}
+                      width="74"
+                      height="74"
+                      alt="Аватар владельца"
+                    />
                   </div>
                   <span className="offer__user-name">
                     {host.name}
