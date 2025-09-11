@@ -1,45 +1,60 @@
-import {Link} from 'react-router-dom';
+import { useCallback, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames';
-import {AppRoute} from '../../const';
-import {PlaceCardProps, PlaceViewType} from '../../types/place';
-
 import '../../styles/main.css';
-import FavoriteButton from '../FavoriteButton/FavoriteButton';
-import { FavoriteButtonViewType } from '../../types/types';
 
-const PlaceCard = ({ viewType, place, onHover }: PlaceCardProps) => {
+import { AppRoute } from '../../const';
+import { PlaceCardProps, PlaceViewType } from '../../types/place';
+import FavoriteButton from '../FavoriteButton';
+import { FavoriteButtonViewType } from '../../types/types';
+import { useAppDispatch } from '../../hooks';
+import { setActivePlaceId } from '../../store/offers/offers';
+import ImageWithFallback from '../ImageWithFallback';
+
+
+const PlaceCard = ({ viewType, place }: PlaceCardProps) => {
+  const dispatch = useAppDispatch();
   const { id, isPremium, rating, previewImage, price, type, title } = place;
 
   const linkRoute = AppRoute.Offer.replace(':id', id.toString());
 
-  const handleMouseEnter = () => {
-    if (onHover) {
-      onHover(place);
-    }
-  };
+  const handleMouseEnter = useCallback(() => {
+    dispatch(setActivePlaceId(id));
+  }, [dispatch, id]);
 
-  const handleMouseLeave = () => {
-    if (onHover) {
-      onHover();
-    }
-  };
+  const handleMouseLeave = useCallback(() => {
+    dispatch(setActivePlaceId());
+  }, [dispatch]);
 
-  const favoritesClass = classNames(
+  const favoritesClass = useMemo(() => classNames(
     'place-card__info',
     {
       'favorites__card-info': viewType === PlaceViewType.Favorite
     }
-  );
+  ), [viewType]);
+
+  const starClassName = classNames(`raiting-${Math.round(rating)}-star`);
 
   return (
-    <article className={`${viewType}__card place-card`} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <article
+      className={`${viewType}__card place-card`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {isPremium &&
         <div className="place-card__mark">
           <span>Premium</span>
         </div>}
       <div className={`${viewType}__image-wrapper place-card__image-wrapper`}>
         <Link to={linkRoute}>
-          <img className="place-card__image" src={previewImage} width="260" height="200" alt="Фото отеля"/>
+          <ImageWithFallback
+            className="place-card__image"
+            src={previewImage}
+            fallbackSrc={'img/placeholder.png'}
+            width="260"
+            height="200"
+            alt="Фото отеля"
+          />
         </Link>
       </div>
       <div className={favoritesClass}>
@@ -52,7 +67,7 @@ const PlaceCard = ({ viewType, place, onHover }: PlaceCardProps) => {
         </div>
         <div className="place-card__rating rating">
           <div className="place-card__stars rating__stars">
-            <span className={`raiting-${Math.round(rating)}-star`}></span>
+            <span className={starClassName}></span>
             <span className="visually-hidden">Rating</span>
           </div>
         </div>

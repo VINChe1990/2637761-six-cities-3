@@ -1,15 +1,16 @@
 import classNames from 'classnames';
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 import {PlaceViewType} from '../../types/place';
-import PlaceCard from '../../components/PlaceCard/PlaceCard';
+import PlaceCard from '../../components/PlaceCard';
 import { City } from '../../types/city';
 import { IPlace } from '../../types/place';
 
 import { useAppSelector } from '../../hooks';
 import { getAllCities } from '../../store/offers/selectors';
 import { getFavorites } from '../../store/favorites/selectors';
+import { useMemo } from 'react';
 
 type FavoriteCityPlaces = {
   city: City;
@@ -59,15 +60,13 @@ const FavoritesPage = () => {
     })
     .filter((item): item is FavoriteCityPlaces => item !== null);
 
-  const favoritesEmpty = favorites.length === 0;
-
-  const renderFavorites = favoritesEmpty ? emptyFavorites() : existingFavorites(favorites);
+  const renderFavorites = useMemo(() => favorites.length === 0 ? emptyFavorites() : existingFavorites(favorites), [favorites]);
 
   const favoritesClass = classNames(
     'page__main',
     'page__main--favorites',
     {
-      'page__main--favorites-empty': favoritesEmpty
+      'page__main--favorites-empty': favorites.length === 0
     }
   );
 

@@ -1,43 +1,70 @@
-import { useState } from 'react';
-import { type MouseEvent } from 'react';
+import { useCallback, useMemo, useState, type MouseEvent } from 'react';
 import classNames from 'classnames';
-
 import { SORT_TYPES, isSortType } from '../../const';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getSortType } from '../../store/offers/selectors';
 import { setSortType } from '../../store/offers/offers';
 
 const PlaceSorting = () => {
-
   const dispatch = useAppDispatch();
 
   const [isFiltersHovered, setIsFiltersHovered] = useState(false);
   const sortType = useAppSelector(getSortType);
 
-  const handleSortTypeClick = (event: MouseEvent<HTMLElement>) => {
+  const handleMouseEnter = useCallback(() => setIsFiltersHovered(true), []);
+  const handleMouseLeave = useCallback(() => setIsFiltersHovered(false), []);
+
+  const handleSortTypeClick = useCallback((event: MouseEvent<HTMLElement>) => {
     const element = event.target as HTMLElement;
     const content = element.textContent ?? '';
     if (isSortType(content)) {
       dispatch(setSortType(content));
       setIsFiltersHovered(false);
     }
-  };
+  }, [dispatch]);
 
-  const filtersClass = classNames(
+  const filtersClass = useMemo(() => classNames(
     'places__options',
     'places__options--custom',
     {
       'places__options--opened': isFiltersHovered
     }
-  );
+  ), [isFiltersHovered]);
+
+  const sortList = useMemo(() => SORT_TYPES.map((item, index) => {
+    const selected = item === sortType;
+    const itemClass = classNames(
+      'places__option',
+      {
+        'places__option--active': selected
+      }
+    );
+    const itemKey = `key-${index}-${item}`;
+
+    return (
+      <li
+        key={itemKey}
+        className={itemClass}
+        role="button"
+        aria-selected={selected}
+        aria-posinset={index + 1}
+        aria-setsize={SORT_TYPES.length}
+        aria-label={`Сортировка по ${item}`}
+        onClick={handleSortTypeClick}
+        tabIndex={0}
+      >
+        {item}
+      </li>
+    );
+  }), [sortType, handleSortTypeClick]);
 
   return (
     <form
       className="places__sorting"
       action="#"
       method="get"
-      onMouseEnter={() => setIsFiltersHovered(true)}
-      onMouseLeave={() => setIsFiltersHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <span className="places__sorting-caption">Sort by&nbsp;</span>
       <span className="places__sorting-type" tabIndex={0}>
@@ -51,32 +78,7 @@ const PlaceSorting = () => {
         role="list"
         aria-label="Способы сортировки"
       >
-        {SORT_TYPES.map((item, index) => {
-          const selected = item === sortType;
-          const itemClass = classNames(
-            'places__option',
-            {
-              'places__option--active': selected
-            }
-          );
-          const itemKey = `key-${index}-${item}`;
-
-          return (
-            <li
-              key={itemKey}
-              className={itemClass}
-              role="button"
-              aria-selected={selected}
-              aria-posinset={index + 1}
-              aria-setsize={SORT_TYPES.length}
-              aria-label={`Сортировка по ${item}`}
-              onClick={handleSortTypeClick}
-              tabIndex={0}
-            >
-              {item}
-            </li>
-          );
-        })}
+        {sortList}
       </ul>
     </form>
   );

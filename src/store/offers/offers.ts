@@ -1,8 +1,8 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {OffersState} from '../../types/store';
-import {fetchOffersAction, fetchOfferViewAction, fetchFavoritesAction, fetchCommentsAction} from '../../store/apiActions';
-import {cityData, getCityByName, getDefaultCity} from '../../store/CityData/CityData';
-import {SliceSpace} from '../../types/types';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { OffersState } from '../../types/store';
+import { fetchOffersAction, fetchOfferViewAction, fetchFavoritesAction, fetchCommentsAction } from '../../store/apiActions';
+import { cityData, getCityByName, getDefaultCity } from '../../store/CityData/CityData';
+import { SliceSpace } from '../../types/types';
 import { SortType } from '../../const';
 import { CONFIG } from '../../config/appConfig';
 
@@ -14,6 +14,7 @@ const initialState: OffersState = {
   allPlaces: [],
   cityPlaces: [],
   cityPlacesCount: 0,
+  activePlaceId: '',
   sortType: CONFIG.defaultSortType,
   offerView: {
     offer: undefined,
@@ -36,6 +37,9 @@ export const offers = createSlice({
     },
     setSortType: (state, action: PayloadAction<SortType>) => {
       state.sortType = action.payload;
+    },
+    setActivePlaceId: (state, action: PayloadAction<string | undefined>) => {
+      state.activePlaceId = action.payload ?? 'unknown';
     }
   },
   extraReducers(builder) {
@@ -90,4 +94,4 @@ export const offers = createSlice({
   }
 });
 
-export const {setCity, setSortType} = offers.actions;
+export const {setCity, setSortType, setActivePlaceId} = offers.actions;

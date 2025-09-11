@@ -1,20 +1,22 @@
-import {useParams} from 'react-router-dom';
-import {useState, useEffect} from 'react';
-
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import classNames from 'classnames';
 import '../../styles/main.css';
-import Header from '../../components/Header/Header';
-import {FavoriteButtonViewType, MapViewType} from '../../types/types';
-import { IPlace, PlaceViewType } from '../../types/place';
-import UserReviews from '../../components/UserReviews/UserReviews';
-import PlaceCard from '../../components/PlaceCard/PlaceCard';
-import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
-import PlaceMap from '../../components/PlaceMap/PlaceMap';
-import Loader from '../../components/Loader/Loader';
 
+import { FavoriteButtonViewType, MapViewType } from '../../types/types';
+import { PlaceViewType } from '../../types/place';
 import { fetchOfferViewAction } from '../../store/apiActions';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getDataIsLoading, getOffer, getOfferNearPlaces } from '../../store/offers/selectors';
-import FavoriteButton from '../../components/FavoriteButton/FavoriteButton';
+import { offerPageSelector } from '../../store/offers/selectors';
+import Header from '../../components/Header';
+import UserReviews from '../../components/UserReviews';
+import PlaceCard from '../../components/PlaceCard';
+import NotFoundPage from '../../pages/NotFoundPage';
+import PlaceMap from '../../components/PlaceMap';
+import FavoriteButton from '../../components/FavoriteButton';
+import Loader from '../../components/Loader';
+import ImageWithFallback from '../../components/ImageWithFallback';
+
 
 type OfferRouteParams = {
   id: string;
@@ -23,20 +25,19 @@ type OfferRouteParams = {
 const OfferPage = () => {
   const dispatch = useAppDispatch();
 
-  const [activeCard, setActiveCard] = useState<IPlace>();
-
-  const dataIsLoading = useAppSelector(getDataIsLoading);
-  const currentOffer = useAppSelector(getOffer);
-  const nearPlaces = useAppSelector(getOfferNearPlaces);
+  const [isLoading, setIsLoading] = useState(true);
+  const { currentOffer, nearPlaces } = useAppSelector(offerPageSelector);
 
   const urlParams = useParams<OfferRouteParams>();
   const placeId = urlParams.id ?? '';
 
   useEffect(() => {
-    dispatch(fetchOfferViewAction(placeId));
+    dispatch(fetchOfferViewAction(placeId)).then(() => {
+      setIsLoading(false);
+    });
   }, [dispatch, placeId]);
 
-  if (dataIsLoading) {
+  if (isLoading) {
     return (
       <Loader />
     );
@@ -48,10 +49,7 @@ const OfferPage = () => {
 
   const { images, isPremium, title, rating, price, type, bedrooms, maxAdults, goods, host, description, city } = currentOffer;
 
-
-  const handlePlaceCardHover = (place?: IPlace) => {
-    setActiveCard(place);
-  };
+  const starClassName = classNames(`raiting-${Math.round(rating)}-star`);
 
   return (
     <div className="page">
@@ -63,7 +61,12 @@ const OfferPage = () => {
             <div className="offer__gallery">
               {images.map((url) => (
                 <div key={url} className="offer__image-wrapper">
-                  <img className="offer__image" src={url} alt="Фото отеля"/>
+                  <ImageWithFallback
+                    className="offer__image"
+                    src={url}
+                    fallbackSrc={'img/placeholder.png'}
+                    alt="Фото отеля"
+                  />
                 </div>
               ))}
             </div>
@@ -82,7 +85,7 @@ const OfferPage = () => {
               </div>
               <div className="offer__rating rating">
                 <div className="offer__stars rating__stars">
-                  <span className={`raiting-${Math.round(rating)}-star`}></span>
+                  <span className={starClassName}></span>
                   <span className="visually-hidden">Rating</span>
                 </div>
                 <span className="offer__rating-value rating__value">{rating}</span>
@@ -116,7 +119,14 @@ const OfferPage = () => {
                 <h2 className="offer__host-title">Meet the host</h2>
                 <div className="offer__host-user user">
                   <div className="offer__avatar-wrapper offer__avatar-wrapper--pro user__avatar-wrapper">
-                    <img className="offer__avatar user__avatar" src={host.avatarUrl} width="74" height="74" alt="Аватар владельца"/>
+                    <ImageWithFallback
+                      className="offer__avatar user__avatar"
+                      src={host.avatarUrl}
+                      fallbackSrc={'img/avatar.svg'}
+                      width="74"
+                      height="74"
+                      alt="Аватар владельца"
+                    />
                   </div>
                   <span className="offer__user-name">
                     {host.name}
@@ -137,13 +147,13 @@ const OfferPage = () => {
               <UserReviews/>
             </div>
           </div>
-          <PlaceMap viewType={MapViewType.Offer} city={city} places={nearPlaces} selectedPlace={activeCard?.id ?? 'unknown'}/>
+          <PlaceMap viewType={MapViewType.Offer} city={city} places={nearPlaces}/>
         </section>
         <div className="container">
           <section className="near-places places">
             <h2 className="near-places__title">Other places in the neighbourhood</h2>
             <div className="near-places__list places__list">
-              {nearPlaces.map((place) => <PlaceCard key={place.id} viewType={PlaceViewType.NearPlaces} place={place} onHover={handlePlaceCardHover}></PlaceCard>)}
+              {nearPlaces.map((place) => <PlaceCard key={place.id} viewType={PlaceViewType.NearPlaces} place={place}></PlaceCard>)}
             </div>
           </section>
         </div>

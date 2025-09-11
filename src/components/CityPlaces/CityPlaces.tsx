@@ -1,22 +1,35 @@
-import { useState } from 'react';
-import {MapViewType} from '../../types/types';
-import {IPlace, PlaceViewType} from '../../types/place';
-import PlaceSorting from '../../components/PlaceSorting/PlaceSorting';
-import PlaceCard from '../../components/PlaceCard/PlaceCard';
-import PlaceMap from '../../components/PlaceMap/PlaceMap';
-import Loader from '../../components/Loader/Loader';
+import { useMemo } from 'react';
+import { MapViewType } from '../../types/types';
+import { PlaceViewType } from '../../types/place';
+import PlaceSorting from '../../components/PlaceSorting';
+import PlaceCard from '../../components/PlaceCard';
+import PlaceMap from '../../components/PlaceMap';
+import Loader from '../../components/Loader';
 
 import { useAppSelector } from '../../hooks';
 import useSort from '../../hooks/useSort';
-import { getDataIsLoading, getCity, getCityPlaces } from '../../store/offers/selectors';
-
+import { cityPlacesSelector } from '../../store/offers/selectors';
 
 const CityPlaces = () => {
-  const dataIsLoading = useAppSelector(getDataIsLoading);
-  const city = useAppSelector(getCity);
-  const cityPlaces = useSort(useAppSelector(getCityPlaces));
+  const { dataIsLoading, city, unsortedPlaces, cityPlacesCount } = useAppSelector(cityPlacesSelector);
 
-  const [activeCard, setActiveCard] = useState<IPlace>();
+  const cityPlaces = useSort(unsortedPlaces);
+
+  const placesText = useMemo(() =>
+    `${cityPlacesCount} place${cityPlacesCount !== 1 ? 's' : ''} to stay in ${city.name}`,
+  [cityPlacesCount, city]
+  );
+
+  const placesList = useMemo(() =>
+    cityPlaces.map((place) => (
+      <PlaceCard
+        key={place.id}
+        viewType={PlaceViewType.Cities}
+        place={place}
+      />
+    )),
+  [cityPlaces]
+  );
 
   if (dataIsLoading){
     return (
@@ -24,7 +37,7 @@ const CityPlaces = () => {
     );
   }
 
-  if (cityPlaces.length === 0) {
+  if (cityPlacesCount === 0) {
     return (
       <section className="cities__no-places">
         <div className="cities__status-wrapper tabs__content">
@@ -35,22 +48,22 @@ const CityPlaces = () => {
     );
   }
 
-  const handlePlaceCardHover = (place?: IPlace) => {
-    setActiveCard(place);
-  };
-
   return (
     <>
       <section className="cities__places places">
         <h2 className="visually-hidden">Places</h2>
-        <span className="places__found">{cityPlaces.length} places to stay in {city.name}</span>
+        <span className="places__found">{placesText}</span>
         <PlaceSorting/>
         <div className="cities__places-list places__list tabs__content">
-          {cityPlaces.map((place) => <PlaceCard key={place.id} viewType={PlaceViewType.Cities} place={place} onHover={handlePlaceCardHover} />)}
+          {placesList}
         </div>
       </section>
       <div className="cities__right-section">
-        <PlaceMap viewType={MapViewType.Cities} city={city} places={cityPlaces} selectedPlace={activeCard?.id ?? 'unknown'}/>
+        <PlaceMap
+          viewType={MapViewType.Cities}
+          city={city}
+          places={cityPlaces}
+        />
       </div>
     </>
   );
